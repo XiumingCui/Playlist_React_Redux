@@ -1,37 +1,54 @@
-import { combineReducers } from "redux";
+import {
+  FETCH_SONGS,
+  ADD_FAV,
+  REMOVE_FAV,
+  ADD_LIS,
+  REMOVE_LIS,
+} from "../constraints";
 
-const songsReducer = (state = [], action) => {
+const initialState = {
+  loading: false,
+  songs: [],
+};
+
+export default (state = initialState, action) => {
+  console.log(action.type);
   switch (action.type) {
-    case "FETCH_SONGS":
-      return action.payload;
+    case FETCH_SONGS:
+      // return {...state, songs: action.payload.data.map(s => {...s, favorited: fasle, listend: fasle})};
+      return { ...state, songs: action.payload.data };
+    case ADD_FAV:
+      console.log(action.type + " : " + action.payload);
+      return {
+        ...state,
+        songs: state.songs.map((s) =>
+          s.id === action.payload ? { ...s, favourite: true } : s
+        ),
+      };
+    case REMOVE_FAV:
+      console.log(action.type + " : " + action.payload);
+      return {
+        ...state,
+        songs: state.songs.map((s) =>
+          s.id === action.payload ? { ...s, favourite: false } : s
+        ),
+      };
+    case ADD_LIS:
+      return {
+        ...state,
+        songs: state.songs.map((s) =>
+          s.id === action.payload ? { ...s, listened: true } : s
+        ),
+      };
+    case REMOVE_LIS:
+      return {
+        ...state,
+        songs: state.songs.map((s) =>
+          s.id === action.payload ? { ...s, listened: false } : s
+        ),
+      };
+
     default:
       return state;
   }
 };
-
-const selectedSongReducer = (selectedSong = [], action) => {
-  if (action.type === "SONG_SELECTED") {
-    return [...selectedSong, action.payload];
-  }else if ( action.type === "SONG_DELETE") {
-    console.log("delete song")
-    return selectedSong.filter(song => song !== action.payload);
-  }
-  return selectedSong;
-};
-
-const listenedSongReducer = (listenedSong = [], action) => {
-  console.log(action.type);
-    if (action.type === "SONG_LISTENED") {
-      return [...listenedSong, action.payload];
-    }else if ( action.type === "SONG_DELETE") {
-      console.log("delete song: " + listenedSong.filter(item => item !== action.payload));
-      return listenedSong.filter(song => song !== action.payload);
-    }
-    return listenedSong;
-  };
-
-export default combineReducers({
-  songs: songsReducer,
-  selectedSong: selectedSongReducer,
-  listenedSong: listenedSongReducer,
-});
